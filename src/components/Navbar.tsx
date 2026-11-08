@@ -13,7 +13,8 @@ import {
   Menu, 
   X,
   ShieldCheck,
-  UserCheck
+  Shield,
+  Briefcase
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -31,14 +32,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdminRole = currentUser && (
+    currentUser.role === 'super_admin' || 
+    currentUser.role === 'admin' || 
+    currentUser.role === 'petugas' ||
+    currentUser.role === 'staff'
+  );
   const isStudent = currentUser?.role === 'student';
 
   const navItems = [
     { id: 'landing', label: 'Beranda', icon: GraduationCap, show: true },
     { id: 'dashboard', label: 'Dashboard Saya', icon: LayoutDashboard, show: isStudent },
     { id: 'schedule', label: 'Jadwal KTM Saya', icon: Calendar, show: isStudent },
-    { id: 'admin-dashboard', label: 'Admin Portal', icon: Users, show: isAdmin },
+    { id: 'admin-dashboard', label: 'Panel Admin', icon: Briefcase, show: !!isAdminRole, isSpecial: true },
     { id: 'announcements', label: 'Pengumuman', icon: Bell, show: true },
     { id: 'help', label: 'Bantuan & FAQ', icon: HelpCircle, show: true }
   ];
@@ -46,6 +52,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleNavClick = (viewId: string) => {
     onNavigate(viewId);
     setMobileMenuOpen(false);
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'super_admin':
+        return <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.5 rounded">SUPER ADMIN</span>;
+      case 'admin':
+        return <span className="bg-emerald-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">ADMIN</span>;
+      case 'petugas':
+        return <span className="bg-teal-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">PETUGAS</span>;
+      default:
+        return <span className="bg-teal-100 text-teal-800 text-[9px] font-bold px-1.5 py-0.5 rounded">MHS</span>;
+    }
   };
 
   return (
@@ -66,6 +85,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="hidden sm:inline bg-emerald-700/60 px-2 py-0.5 rounded text-amber-300 font-mono">
               Tahun Ajaran 2026
             </span>
+            <span className="text-emerald-400">|</span>
+            <button
+              onClick={() => handleNavClick(isAdminRole ? 'admin-dashboard' : 'admin-login')}
+              className="text-amber-300 hover:text-white font-bold underline flex items-center gap-1 transition-colors"
+              type="button"
+            >
+              <span>{isAdminRole ? 'Buka Admin Panel' : 'Portal Admin'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -105,28 +132,32 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-1">
-            {navItems.filter(item => item.show).map(item => {
-              const Icon = item.icon;
-              const isActive = currentView === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    isActive 
-                      ? 'bg-emerald-50 text-emerald-800 shadow-xs border border-emerald-200' 
-                      : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-100/70'
-                  }`}
-                  type="button"
-                >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
+            {navItems
+              .filter(item => item.show)
+              .map(item => {
+                const Icon = item.icon;
+                const isActive = currentView === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+                      item.isSpecial
+                        ? 'bg-amber-400 text-slate-900 hover:bg-amber-300 font-extrabold shadow-xs ml-1'
+                        : isActive
+                          ? 'bg-emerald-50 text-emerald-700 font-bold'
+                          : 'text-slate-600 hover:text-emerald-700 hover:bg-slate-50'
+                    }`}
+                    type="button"
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
           </nav>
 
-          {/* User Account / Login Action */}
+          {/* User Profile or Login CTA */}
           <div className="hidden sm:flex items-center gap-3">
             {currentUser ? (
               <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
@@ -135,20 +166,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span className="text-xs font-bold text-slate-800 max-w-[160px] truncate block">
                       {currentUser.nama}
                     </span>
-                    {currentUser.role === 'admin' ? (
-                      <span className="bg-emerald-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                        ADMIN
-                      </span>
-                    ) : (
-                      <span className="bg-teal-100 text-teal-800 text-[9px] font-bold px-1.5 py-0.5 rounded">
-                        MHS
-                      </span>
-                    )}
+                    {getRoleBadge(currentUser.role)}
                   </div>
                   <p className="text-[11px] text-slate-500 font-mono">
                     {currentUser.nim ? `NIM: ${currentUser.nim}` : currentUser.email}
                   </p>
                 </div>
+
+                {isAdminRole && (
+                  <button
+                    onClick={() => handleNavClick('admin-dashboard')}
+                    className="p-2 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                    title="Buka Admin Panel"
+                    type="button"
+                  >
+                    <Briefcase className="w-4 h-4" />
+                  </button>
+                )}
 
                 <button
                   onClick={onLogout}
@@ -163,8 +197,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <div className="flex items-center gap-2">
                 <button
+                  onClick={() => handleNavClick('admin-login')}
+                  className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg border border-slate-300 transition-all"
+                  type="button"
+                >
+                  <Briefcase className="w-3.5 h-3.5 text-teal-700" />
+                  <span>Admin / Petugas</span>
+                </button>
+
+                <button
                   onClick={() => handleNavClick('login')}
-                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow transition-all"
+                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow-xs hover:shadow transition-all"
                   type="button"
                 >
                   <LogIn className="w-4 h-4" />
@@ -198,72 +241,74 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-5 space-y-2 shadow-lg animate-in slide-in-from-top duration-200">
-          {currentUser && (
-            <div className="p-3 bg-slate-50 rounded-xl mb-3 border border-slate-200">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-slate-800">{currentUser.nama}</p>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                  {currentUser.role.toUpperCase()}
-                </span>
-              </div>
-              <p className="text-xs font-mono text-slate-500 mt-0.5">
-                {currentUser.nim ? `NIM: ${currentUser.nim}` : currentUser.email}
-              </p>
-              {currentUser.programStudi && (
-                <p className="text-xs text-teal-700 font-medium mt-1">
-                  {currentUser.programStudi}
-                </p>
-              )}
-            </div>
-          )}
+        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top duration-200">
+          <nav className="flex flex-col space-y-1">
+            {navItems
+              .filter(item => item.show)
+              .map(item => {
+                const Icon = item.icon;
+                const isActive = currentView === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id)}
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-left transition-colors ${
+                      item.isSpecial
+                        ? 'bg-amber-400 text-slate-900 font-extrabold'
+                        : isActive
+                          ? 'bg-emerald-50 text-emerald-700 font-bold'
+                          : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                    type="button"
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+          </nav>
 
-          <div className="space-y-1">
-            {navItems.filter(item => item.show).map(item => {
-              const Icon = item.icon;
-              const isActive = currentView === item.id;
-              return (
+          <div className="pt-3 border-t border-slate-200 space-y-2">
+            {!currentUser ? (
+              <div className="grid grid-cols-2 gap-2">
                 <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                    isActive 
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                      : 'text-slate-700 hover:bg-slate-100'
-                  }`}
+                  onClick={() => handleNavClick('admin-login')}
+                  className="w-full py-2.5 px-3 bg-slate-100 text-slate-800 text-xs font-bold rounded-lg border border-slate-300 flex items-center justify-center gap-1.5"
                   type="button"
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600' : 'text-slate-500'}`} />
-                  <span>{item.label}</span>
+                  <Briefcase className="w-3.5 h-3.5 text-teal-700" />
+                  <span>Admin / Petugas</span>
                 </button>
-              );
-            })}
-          </div>
-
-          <div className="pt-3 border-t border-slate-200">
-            {currentUser ? (
-              <button
-                onClick={() => {
-                  onLogout();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors"
-                type="button"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Keluar dari Akun</span>
-              </button>
+                <button
+                  onClick={() => handleNavClick('login')}
+                  className="w-full py-2.5 px-3 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5"
+                  type="button"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Login Mahasiswa</span>
+                </button>
+              </div>
             ) : (
-              <button
-                onClick={() => handleNavClick('login')}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm"
-                type="button"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Masuk ke Akun Mahasiswa</span>
-              </button>
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-slate-800">{currentUser.nama}</p>
+                    {getRoleBadge(currentUser.role)}
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                    {currentUser.nim ? `NIM: ${currentUser.nim}` : currentUser.email}
+                  </p>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition-colors"
+                  type="button"
+                >
+                  Logout
+                </button>
+              </div>
             )}
           </div>
         </div>

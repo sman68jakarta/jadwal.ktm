@@ -2,7 +2,11 @@ import React from 'react';
 import { ShieldCheck, MapPin, Phone, Mail, Clock, ExternalLink } from 'lucide-react';
 import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigate?: (view: string) => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="bg-slate-900 text-slate-400 text-sm border-t border-slate-800 mt-auto">
       {/* Upper footer */}
@@ -73,7 +77,7 @@ export const Footer: React.FC = () => {
               <li className="hover:text-emerald-300 transition-colors">5. D3 Akuntansi</li>
               <li className="hover:text-emerald-300 transition-colors">6. D3 Perbankan dan Keuangan</li>
             </ul>
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col gap-1.5">
               <a 
                 href="https://upnvj.ac.id" 
                 target="_blank" 
@@ -83,6 +87,15 @@ export const Footer: React.FC = () => {
                 <span>Portal Utama UPNVJ</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
+              {onNavigate && (
+                <button
+                  onClick={() => onNavigate('admin-login')}
+                  className="text-left text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
+                  type="button"
+                >
+                  Portal Petugas & Administrator →
+                </button>
+              )}
             </div>
           </div>
         </div>

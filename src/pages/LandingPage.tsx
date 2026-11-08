@@ -22,11 +22,13 @@ import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 interface LandingPageProps {
   onNavigateLogin: (prefilledNim?: string) => void;
   onNavigateHelp: () => void;
+  onNavigateAdminLogin?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onNavigateLogin,
-  onNavigateHelp
+  onNavigateHelp,
+  onNavigateAdminLogin
 }) => {
   const [searchNim, setSearchNim] = useState('');
   const [searchResult, setSearchResult] = useState<{
@@ -100,6 +102,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <Calendar className="w-4 h-4 text-amber-400" />
                   <span>Lihat Alur & Persyaratan</span>
                 </a>
+
+                {onNavigateAdminLogin && (
+                  <button
+                    onClick={onNavigateAdminLogin}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-bold text-slate-200 hover:text-white bg-slate-800/90 hover:bg-slate-700/90 border border-slate-600 transition-colors text-xs"
+                    type="button"
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-teal-400" />
+                    <span>Portal Admin</span>
+                  </button>
+                )}
               </div>
 
               {/* Quick NIM Checker Widget (Strictly Privacy-First: asks login to view details) */}

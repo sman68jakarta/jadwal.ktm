@@ -1,0 +1,1281 @@
+# MASTER PROMPT — ADMIN PANEL
+## SISTEM INFORMASI DATA PEMBUATAN DAN PEMBAGIAN KTM UPNVJ 2026
+
+Bertindaklah sebagai Senior Full-Stack Developer, UI/UX Designer, Firebase Engineer, Database Architect, dan Security Engineer profesional.
+
+Saya ingin kamu mengembangkan **ADMIN PANEL** untuk website Sistem Informasi Data Pembuatan dan Pembagian Kartu Tanda Mahasiswa Baru UPNVJ 2026.
+
+Admin panel ini merupakan bagian dari website utama yang sebelumnya telah dibuat.
+
+Website utama digunakan oleh mahasiswa untuk login dan melihat jadwal KTM mereka.
+
+Admin panel digunakan oleh administrator dan petugas untuk mengelola seluruh proses pembuatan, penjadwalan, distribusi, serta pengelolaan data mahasiswa.
+
+Admin panel harus benar-benar berfungsi, bukan sekadar dashboard statis.
+
+Seluruh fitur harus terintegrasi dengan Firebase Firestore dan Firebase Authentication.
+
+**PENTING:**
+
+Jangan membuat website baru yang terpisah dari sistem sebelumnya.
+
+Kembangkan admin panel sebagai bagian dari aplikasi yang sudah ada, dengan tetap menggunakan konfigurasi Firebase, struktur database, sistem autentikasi, dan desain yang telah dibuat sebelumnya.
+
+Jika project sebelumnya sudah menggunakan React + Vite, lanjutkan dengan teknologi tersebut.
+
+Jangan mengganti teknologi utama tanpa alasan yang kuat.
+
+---
+
+# 1. IDENTITAS ADMIN PANEL
+
+Nama aplikasi:
+
+KTM UPNVJ 2026 — Admin Panel
+
+Nama lengkap:
+
+Sistem Informasi Data Pembuatan dan Pembagian Kartu Tanda Mahasiswa Baru Universitas Pembangunan Nasional "Veteran" Jakarta.
+
+Deskripsi:
+
+Admin Panel merupakan pusat pengelolaan data mahasiswa, jadwal pembuatan KTM, jadwal distribusi, status KTM, pengumuman, serta monitoring proses distribusi KTM mahasiswa baru UPNVJ tahun 2026.
+
+Admin panel harus memiliki tampilan modern, profesional, premium, dan mudah digunakan.
+
+Target pengguna:
+- Super Admin.
+- Admin.
+- Petugas Distribusi.
+
+Gunakan Bahasa Indonesia sebagai bahasa utama.
+
+---
+
+# 2. DESAIN UI/UX ADMIN PANEL
+
+Buat desain dashboard admin dengan konsep:
+
+Modern Administrative Dashboard
+University Management System
+Premium SaaS Dashboard
+Clean Data Management Interface
+
+Gunakan palet warna yang sama dengan website utama.
+
+## Warna utama
+
+- Hijau: #16A34A
+- Hijau gelap: #166534
+- Biru tosca: #0D9488
+- Biru tosca muda: #CCFBF1
+- Kuning: #FACC15
+- Kuning muda: #FEF9C3
+- Putih: #FFFFFF
+- Background: #F8FAFC
+- Teks utama: #0F172A
+- Teks sekunder: #64748B
+
+Gunakan kombinasi hijau dan biru tosca sebagai identitas utama dashboard.
+
+Kuning digunakan sebagai aksen informasi penting, highlight, peringatan, dan indikator tertentu.
+
+## Layout desktop
+
+Gunakan layout:
+
+- Sidebar di sebelah kiri.
+- Header di bagian atas.
+- Main content di bagian tengah.
+- Dashboard cards.
+- Tabel data modern.
+- Search bar.
+- Filter.
+- Pagination.
+- Modal untuk aksi tertentu.
+
+Sidebar harus dapat:
+- Diperluas.
+- Diperkecil menjadi icon-only.
+- Menampilkan active state.
+- Menyesuaikan hak akses pengguna.
+
+## Layout mobile
+
+Pada mobile:
+- Sidebar berubah menjadi drawer.
+- Tabel berubah menjadi card atau horizontal scroll yang terkontrol.
+- Search bar tetap mudah digunakan.
+- Tombol memiliki ukuran yang nyaman.
+- Dashboard cards disusun vertikal.
+- Tidak boleh terjadi horizontal overflow pada seluruh halaman.
+
+Gunakan font Inter atau Plus Jakarta Sans.
+
+Gunakan Lucide Icons.
+
+Tambahkan:
+- Hover effects.
+- Smooth transitions.
+- Loading skeleton.
+- Toast notifications.
+- Confirmation modal.
+- Empty state.
+- Error state.
+- Micro-interactions.
+
+Jangan membuat tampilan terlalu ramai.
+
+---
+
+# 3. SISTEM LOGIN ADMIN
+
+Buat halaman login khusus administrator.
+
+URL yang disarankan:
+
+`/admin/login`
+
+Halaman login harus memiliki:
+- Logo UPNVJ.
+- Nama sistem.
+- Input email atau username yang sesuai dengan implementasi autentikasi.
+- Input password.
+- Tombol show/hide password.
+- Tombol login.
+- Loading indicator.
+- Error message.
+- Informasi keamanan.
+
+Contoh teks:
+
+"Silakan masuk menggunakan akun administrator untuk mengelola data pembuatan dan distribusi KTM mahasiswa baru UPNVJ."
+
+Gunakan Firebase Authentication.
+
+Jangan menyimpan password admin di Firestore.
+
+Jangan menggunakan username dan password statis yang ditulis langsung dalam kode.
+
+Jangan membuat akun admin otomatis tanpa mekanisme otorisasi yang aman.
+
+Setelah login:
+- Verifikasi identitas pengguna.
+- Verifikasi role pengguna.
+- Arahkan admin ke dashboard.
+- Arahkan petugas ke dashboard sesuai kewenangannya.
+- Tolak akses mahasiswa ke halaman admin.
+
+Jika pengguna bukan admin atau petugas, tampilkan halaman:
+
+"Akses Ditolak"
+
+Jangan hanya mengandalkan proteksi route pada frontend.
+
+Hak akses juga harus dilindungi melalui Firestore Security Rules.
+
+---
+
+# 4. SIDEBAR ADMIN PANEL
+
+Buat sidebar dengan navigasi berikut.
+
+## Dashboard
+- Overview.
+- Statistik Distribusi.
+- Aktivitas Terbaru.
+
+## Data Mahasiswa
+- Seluruh Mahasiswa.
+- Data Mahasiswa S1.
+- Data Mahasiswa D3.
+- Detail Mahasiswa.
+- Tambah Mahasiswa.
+- Edit Data Mahasiswa.
+
+## Distribusi KTM
+- Jadwal Distribusi.
+- Pengelolaan Jadwal.
+- Status Pembuatan KTM.
+- Status Distribusi.
+- Monitoring Distribusi.
+
+## Import dan Export
+- Import Excel.
+- Preview Data.
+- Riwayat Import.
+- Export Excel.
+- Export CSV.
+
+## Pengumuman
+- Daftar Pengumuman.
+- Buat Pengumuman.
+- Edit Pengumuman.
+
+## Pengguna
+- Daftar Admin.
+- Daftar Petugas.
+- Pengelolaan Role.
+- Aktivasi Akun.
+
+## Pengaturan
+- Pengaturan Website.
+- Informasi Distribusi.
+- Pengaturan Akun.
+- Logout.
+
+Menu harus menyesuaikan role pengguna.
+
+Petugas tidak boleh melihat menu yang hanya diperuntukkan bagi Super Admin.
+
+---
+
+# 5. DASHBOARD OVERVIEW
+
+Buat dashboard admin yang informatif.
+
+Header:
+
+"Dashboard Admin"
+
+Subjudul:
+
+"Pantau dan kelola proses pembuatan serta distribusi KTM mahasiswa baru UPNVJ 2026."
+
+Tambahkan greeting dinamis:
+
+"Selamat datang, [Nama Admin]"
+
+## Statistik utama
+
+Buat summary cards:
+
+1. Total Mahasiswa.
+2. KTM Sudah Jadi.
+3. KTM Dalam Proses.
+4. Belum Dijadwalkan.
+5. Distribusi Hari Ini.
+6. Distribusi Selesai.
+
+Seluruh angka harus berasal dari Firestore.
+
+Jangan menggunakan angka statis.
+
+Jika data tidak tersedia, tampilkan 0 atau informasi belum tersedia sesuai konteks.
+
+## Grafik statistik
+
+Buat visualisasi:
+- Distribusi mahasiswa berdasarkan program studi.
+- Status pembuatan KTM.
+- Distribusi berdasarkan tanggal.
+- Perbandingan mahasiswa S1 dan D3.
+- Progress distribusi KTM.
+
+Gunakan Chart.js atau Recharts.
+
+Grafik harus responsif.
+
+## Aktivitas terbaru
+
+Tampilkan daftar aktivitas admin:
+
+- Data mahasiswa ditambahkan.
+- Jadwal distribusi diubah.
+- Status KTM diperbarui.
+- Pengumuman dibuat.
+- Data Excel diimpor.
+
+Aktivitas harus berasal dari sistem audit log Firestore.
+
+Jangan membuat aktivitas palsu.
+
+---
+
+# 6. MANAJEMEN DATA MAHASISWA
+
+Buat halaman:
+
+`/admin/students`
+
+Halaman ini merupakan pusat pengelolaan seluruh data mahasiswa.
+
+Sumber data utama:
+
+File Excel:
+
+`JADWAL DISTRIBUSI KTM S1 DAN D3 2026.xlsx`
+
+Data memiliki kolom:
+
+- No.
+- NIM.
+- NAMA.
+- Program Studi.
+- Keterangan.
+- Jadwal.
+- Waktu.
+
+Total data awal: 1.089 mahasiswa.
+
+Program studi:
+- S1 Akuntansi.
+- S1 Manajemen.
+- S1 Ekonomi Pembangunan.
+- S1 Ekonomi Syariah.
+- D3 Akuntansi.
+- D3 Perbankan dan Keuangan.
+
+Gunakan data Excel yang sebenarnya.
+
+Jangan membuat data mahasiswa fiktif.
+
+Jangan mengubah NIM menjadi number.
+
+NIM harus disimpan sebagai string agar format aslinya tetap terjaga.
+
+## Tabel data mahasiswa
+
+Buat tabel modern dengan kolom:
+
+- Checkbox.
+- No.
+- NIM.
+- Nama Mahasiswa.
+- Program Studi.
+- Status KTM.
+- Jadwal Distribusi.
+- Waktu.
+- Aksi.
+
+Kolom aksi:
+- Detail.
+- Edit.
+- Hapus.
+
+Gunakan confirmation modal untuk penghapusan data.
+
+Jangan menghapus data secara langsung tanpa konfirmasi.
+
+## Fitur pencarian
+
+Buat search bar:
+
+"Cari NIM atau nama mahasiswa..."
+
+Fitur:
+- Pencarian berdasarkan NIM.
+- Pencarian berdasarkan nama.
+- Pencarian berdasarkan program studi.
+- Debounce.
+- Clear search.
+- Loading indicator.
+- Empty state.
+
+Gunakan query Firestore yang sesuai.
+
+Jangan mengunduh seluruh database mahasiswa ke browser jika tidak diperlukan.
+
+Gunakan pagination.
+
+## Fitur filter
+
+Tambahkan filter:
+- Program Studi.
+- Jenjang.
+- Status KTM.
+- Tanggal distribusi.
+- Waktu distribusi.
+
+Tambahkan tombol:
+
+"Reset Filter"
+
+## Fitur sorting
+
+Admin dapat mengurutkan data berdasarkan:
+- NIM.
+- Nama.
+- Program Studi.
+- Tanggal Distribusi.
+- Status KTM.
+
+## Pagination
+
+Gunakan pagination yang efisien.
+
+Pilihan jumlah data:
+- 10.
+- 25.
+- 50.
+- 100.
+
+Tampilkan informasi:
+
+"Menampilkan 1–25 dari total mahasiswa."
+
+Pagination harus terintegrasi dengan Firestore.
+
+---
+
+# 7. DETAIL MAHASISWA
+
+Buat halaman atau modal detail mahasiswa.
+
+URL:
+
+`/admin/students/:nim`
+
+Tampilkan:
+
+## Identitas mahasiswa
+
+- NIM.
+- Nama.
+- Program Studi.
+- Jenjang.
+- Angkatan.
+
+## Informasi KTM
+
+- Status pembuatan.
+- Tanggal distribusi.
+- Hari distribusi.
+- Waktu distribusi.
+- Lokasi distribusi.
+- Keterangan.
+
+## Riwayat
+
+Tampilkan riwayat perubahan:
+- Status KTM.
+- Jadwal.
+- Waktu.
+- Keterangan.
+
+Riwayat harus berasal dari audit log.
+
+Tambahkan tombol:
+- Edit Data.
+- Edit Jadwal.
+- Ubah Status.
+- Kembali.
+
+Jangan menampilkan informasi yang tidak tersedia dalam database.
+
+---
+
+# 8. TAMBAH DAN EDIT DATA MAHASISWA
+
+Buat form tambah mahasiswa.
+
+Field:
+- NIM.
+- Nama.
+- Program Studi.
+- Angkatan.
+- Status KTM.
+- Tanggal Distribusi.
+- Waktu Distribusi.
+- Lokasi.
+- Keterangan.
+
+Validasi:
+- NIM wajib diisi.
+- NIM harus unik.
+- Nama wajib diisi.
+- Program studi harus valid.
+- Tanggal harus valid jika diisi.
+- Waktu harus valid jika diisi.
+
+Buat form edit mahasiswa.
+
+Perubahan harus langsung tersimpan ke Firestore.
+
+Tampilkan:
+- Loading.
+- Success notification.
+- Error notification.
+
+Setiap perubahan penting harus dicatat dalam audit log.
+
+Jangan mengubah data tanpa konfirmasi jika perubahan memengaruhi jadwal distribusi mahasiswa.
+
+---
+
+# 9. PENGELOLAAN JADWAL DISTRIBUSI
+
+Buat halaman:
+
+`/admin/schedules`
+
+Admin dapat mengelola jadwal distribusi KTM.
+
+Fitur:
+- Membuat jadwal.
+- Mengedit jadwal.
+- Menghapus jadwal.
+- Mengubah waktu.
+- Mengubah lokasi.
+- Menentukan kelompok distribusi.
+- Menentukan program studi.
+- Melihat mahasiswa yang masuk dalam jadwal.
+- Melihat jumlah mahasiswa per jadwal.
+
+Field jadwal:
+- Nama jadwal.
+- Tanggal.
+- Hari.
+- Waktu mulai.
+- Waktu selesai.
+- Lokasi.
+- Program Studi.
+- Kelompok.
+- Keterangan.
+- Status jadwal.
+
+Status jadwal:
+- Draft.
+- Aktif.
+- Selesai.
+- Dibatalkan.
+
+Gunakan validasi tanggal dan waktu.
+
+Jangan mengizinkan jadwal selesai memiliki waktu mulai setelah waktu selesai.
+
+Jika jadwal diubah, data mahasiswa yang terhubung harus diperbarui secara konsisten.
+
+Perubahan jadwal harus tercermin pada dashboard mahasiswa.
+
+Jangan membuat informasi lokasi yang tidak diberikan oleh administrator.
+
+---
+
+# 10. PENGELOLAAN STATUS KTM
+
+Buat sistem status KTM yang konsisten.
+
+Status utama:
+- Belum Diproses.
+- Dalam Proses Pembuatan.
+- Sudah Jadi.
+- Siap Diambil.
+- Sudah Didistribusikan.
+
+Gunakan status tersebut sebagai sistem internal.
+
+Jika Excel menggunakan istilah berbeda, lakukan mapping yang jelas dan dapat dikonfigurasi.
+
+Jangan mengubah status Excel secara sembarangan.
+
+Admin dapat:
+- Mengubah status satu mahasiswa.
+- Mengubah status beberapa mahasiswa sekaligus.
+- Melihat riwayat status.
+- Menambahkan keterangan.
+
+Contoh:
+
+Mahasiswa A:
+Status sebelumnya: Dalam Proses Pembuatan.
+
+Status baru: Siap Diambil.
+
+Waktu perubahan: Timestamp Firestore.
+
+Diubah oleh: Admin yang sedang login.
+
+Keterangan: KTM telah selesai dicetak.
+
+Setiap perubahan harus masuk ke audit log.
+
+---
+
+# 11. FITUR BULK ACTION
+
+Buat fitur pengelolaan data secara massal.
+
+Admin dapat memilih beberapa mahasiswa menggunakan checkbox.
+
+Bulk action:
+- Ubah status KTM.
+- Ubah jadwal distribusi.
+- Ubah waktu distribusi.
+- Ubah lokasi distribusi.
+- Export data terpilih.
+- Hapus data terpilih jika memiliki kewenangan.
+
+Tampilkan jumlah mahasiswa yang dipilih.
+
+Contoh:
+
+"25 mahasiswa dipilih."
+
+Sebelum melakukan perubahan, tampilkan confirmation modal.
+
+Contoh:
+
+"Anda akan mengubah jadwal distribusi untuk 25 mahasiswa. Apakah Anda yakin?"
+
+Gunakan batch write atau mekanisme transaksi yang sesuai dengan batas Firestore.
+
+Jika operasi gagal sebagian, tampilkan hasil yang jelas.
+
+Jangan mengklaim semua data berhasil diperbarui jika sebagian gagal.
+
+---
+
+# 12. IMPORT EXCEL
+
+Buat halaman:
+
+`/admin/import`
+
+Halaman ini harus menjadi fitur penting admin panel.
+
+Admin dapat mengunggah Excel.
+
+Format yang didukung:
+- XLSX.
+- XLS.
+
+Gunakan SheetJS.
+
+## Alur import
+
+Tahap 1:
+Upload file Excel.
+
+Tahap 2:
+Pilih sheet.
+
+Tahap 3:
+Preview data.
+
+Tahap 4:
+Validasi kolom.
+
+Tahap 5:
+Validasi NIM.
+
+Tahap 6:
+Deteksi data duplikat.
+
+Tahap 7:
+Pilih mode import.
+
+Tahap 8:
+Konfirmasi.
+
+Tahap 9:
+Import ke Firestore.
+
+Tahap 10:
+Tampilkan ringkasan hasil.
+
+## Mode import
+
+1. Tambahkan data baru.
+2. Perbarui data berdasarkan NIM.
+3. Sinkronisasi data berdasarkan NIM.
+
+Jangan menghapus data lama secara otomatis.
+
+## Validasi
+
+Periksa:
+- NIM kosong.
+- NIM duplikat.
+- Nama kosong.
+- Program studi tidak valid.
+- Tanggal tidak valid.
+- Waktu tidak valid.
+- Kolom tidak sesuai.
+- Data dengan format tidak dikenal.
+
+## Hasil import
+
+Tampilkan:
+- Total baris.
+- Data berhasil.
+- Data gagal.
+- Data duplikat.
+- Data dilewati.
+- Waktu import.
+- Nama file.
+
+Sediakan tombol:
+
+"Download Laporan Import"
+
+Laporan harus menjelaskan data mana yang gagal dan alasannya.
+
+Gunakan batch write yang memperhatikan batas maksimum Firestore.
+
+Jangan melakukan satu operasi besar yang berpotensi gagal seluruhnya.
+
+---
+
+# 13. EXPORT EXCEL DAN CSV
+
+Buat fitur export.
+
+Admin dapat mengunduh:
+- Seluruh data mahasiswa.
+- Data berdasarkan program studi.
+- Data berdasarkan status KTM.
+- Data berdasarkan tanggal distribusi.
+- Data hasil pencarian.
+- Data mahasiswa yang dipilih.
+
+Format:
+- XLSX.
+- CSV.
+
+Nama file:
+
+`Data_Distribusi_KTM_UPNVJ_2026.xlsx`
+
+Gunakan SheetJS.
+
+Pastikan:
+- NIM tetap berupa string.
+- Tanggal konsisten.
+- Header jelas.
+- Kolom sesuai.
+- Data tidak terpotong.
+- File dapat dibuka dengan Microsoft Excel.
+
+Jangan mengizinkan petugas mengekspor data yang berada di luar kewenangannya.
+
+---
+
+# 14. PENGELOLAAN PENGUMUMAN
+
+Buat halaman:
+
+`/admin/announcements`
+
+Admin dapat:
+- Membuat pengumuman.
+- Mengedit pengumuman.
+- Menghapus pengumuman.
+- Mengaktifkan pengumuman.
+- Menonaktifkan pengumuman.
+- Menjadwalkan publikasi jika fitur tersedia.
+
+Field:
+- Judul.
+- Isi.
+- Kategori.
+- Tanggal publikasi.
+- Status.
+- Target audiens.
+
+Kategori:
+- Informasi.
+- Jadwal.
+- Perubahan Jadwal.
+- Penting.
+- Administrasi.
+
+Target audiens:
+- Seluruh mahasiswa.
+- Program studi tertentu.
+- Jenjang tertentu.
+
+Pengumuman harus tampil pada website utama sesuai target audiens.
+
+Gunakan Firestore sebagai sumber data.
+
+Jangan menggunakan pengumuman statis.
+
+---
+
+# 15. MANAJEMEN ADMIN DAN PETUGAS
+
+Buat halaman:
+
+`/admin/users`
+
+Sistem memiliki role:
+
+## Super Admin
+
+Memiliki kewenangan penuh:
+- Mengelola admin.
+- Mengelola petugas.
+- Mengelola seluruh data mahasiswa.
+- Mengelola jadwal.
+- Mengelola pengumuman.
+- Mengelola konfigurasi.
+- Melihat audit log.
+- Melakukan import dan export.
+
+## Admin
+
+Dapat:
+- Mengelola data mahasiswa.
+- Mengelola jadwal.
+- Mengelola status KTM.
+- Mengelola pengumuman.
+- Melihat statistik.
+
+## Petugas Distribusi
+
+Dapat:
+- Melihat data mahasiswa sesuai kewenangan.
+- Mencari mahasiswa.
+- Melihat jadwal.
+- Memperbarui status distribusi sesuai izin.
+- Melakukan konfirmasi distribusi KTM.
+
+Petugas tidak boleh:
+- Mengubah role.
+- Mengelola akun Super Admin.
+- Mengubah konfigurasi keamanan.
+- Menghapus seluruh database.
+- Mengubah data di luar kewenangannya.
+
+Role harus diverifikasi secara aman.
+
+Gunakan Firebase Authentication dan mekanisme otorisasi yang sesuai.
+
+Jika menggunakan Firebase Custom Claims, jelaskan cara penetapannya melalui lingkungan server yang aman.
+
+Jangan memberikan akses admin hanya berdasarkan data role yang dapat diubah pengguna di browser.
+
+---
+
+# 16. MONITORING DISTRIBUSI
+
+Buat halaman:
+
+`/admin/monitoring`
+
+Halaman ini digunakan untuk memantau proses distribusi KTM.
+
+Tampilkan:
+- Total mahasiswa.
+- Total KTM siap diambil.
+- Total KTM sudah didistribusikan.
+- Total KTM belum didistribusikan.
+- Total mahasiswa per jadwal.
+- Progress distribusi.
+
+Buat visualisasi progress.
+
+Contoh:
+
+Progress distribusi KTM:
+
+75% selesai.
+
+Angka tersebut harus dihitung secara dinamis dari Firestore.
+
+Jangan menggunakan angka statis.
+
+Tambahkan filter:
+- Tanggal.
+- Program Studi.
+- Kelompok.
+- Status distribusi.
+
+---
+
+# 17. KONFIRMASI DISTRIBUSI KTM
+
+Buat fitur konfirmasi bahwa KTM telah diterima mahasiswa.
+
+Admin atau petugas dapat membuka data mahasiswa.
+
+Tampilkan:
+- Nama.
+- NIM.
+- Program Studi.
+- Status KTM.
+- Jadwal distribusi.
+
+Tambahkan tombol:
+
+"Konfirmasi KTM Telah Diterima"
+
+Saat tombol diklik:
+1. Tampilkan confirmation modal.
+2. Pastikan pengguna memiliki izin.
+3. Perbarui status menjadi Sudah Didistribusikan.
+4. Simpan timestamp distribusi.
+5. Catat petugas yang melakukan konfirmasi.
+6. Simpan audit log.
+7. Perbarui dashboard mahasiswa.
+8. Tampilkan notifikasi berhasil.
+
+Jangan menandai KTM sudah diterima tanpa konfirmasi petugas.
+
+---
+
+# 18. AUDIT LOG
+
+Buat sistem audit log.
+
+Collection:
+
+`audit_logs`
+
+Field:
+- actorUid.
+- actorName.
+- actorRole.
+- action.
+- entityType.
+- entityId.
+- beforeData.
+- afterData.
+- timestamp.
+- description.
+
+Aktivitas yang dicatat:
+- Login admin.
+- Logout.
+- Import Excel.
+- Edit mahasiswa.
+- Edit jadwal.
+- Ubah status KTM.
+- Konfirmasi distribusi.
+- Buat pengumuman.
+- Hapus data.
+
+Audit log harus dibuat secara aman.
+
+Pengguna biasa tidak boleh mengubah audit log.
+
+Jangan mencatat password, token, atau informasi autentikasi sensitif.
+
+---
+
+# 19. FIREBASE FIRESTORE
+
+Gunakan Firebase Firestore sebagai satu-satunya database.
+
+Gunakan Firebase Authentication untuk autentikasi.
+
+Jangan menggunakan:
+- MySQL.
+- PostgreSQL.
+- MongoDB.
+- Supabase.
+- Firebase Realtime Database.
+- Backend database tambahan.
+
+Gunakan struktur database yang konsisten dengan website utama.
+
+Contoh collection:
+
+students
+users
+schedules
+announcements
+settings
+audit_logs
+import_history
+
+Jangan membuat collection yang tidak diperlukan.
+
+Setiap document harus memiliki struktur yang jelas.
+
+Gunakan:
+- Timestamp.
+- String untuk NIM.
+- Boolean untuk status aktif.
+- Field role yang konsisten.
+- Reference atau identifier yang konsisten.
+- createdAt.
+- updatedAt.
+
+Pastikan data mahasiswa yang dikelola admin merupakan data yang sama dengan data yang dibaca website utama.
+
+Jangan membuat database mahasiswa kedua yang terpisah.
+
+---
+
+# 20. FIRESTORE SECURITY RULES
+
+Buat Firestore Security Rules yang aman dan lengkap.
+
+Rules harus melindungi:
+- students.
+- users.
+- schedules.
+- announcements.
+- settings.
+- audit_logs.
+- import_history.
+
+Ketentuan:
+
+Mahasiswa:
+- Hanya membaca data miliknya sendiri.
+- Tidak dapat mengubah status KTM.
+- Tidak dapat mengubah jadwal.
+- Tidak dapat mengubah role.
+- Tidak dapat membaca seluruh data mahasiswa.
+
+Petugas:
+- Hanya dapat membaca dan memperbarui data sesuai kewenangan.
+- Tidak dapat mengelola role.
+- Tidak dapat mengubah konfigurasi keamanan.
+- Tidak dapat menghapus seluruh data.
+
+Admin:
+- Dapat mengelola data sesuai role.
+- Tidak otomatis memiliki hak Super Admin.
+
+Super Admin:
+- Memiliki akses administratif penuh sesuai kebijakan sistem.
+
+Jangan menggunakan:
+
+`allow read, write: if true;`
+
+Jangan hanya mengandalkan proteksi frontend.
+
+Jelaskan cara melakukan pengujian Firestore Security Rules menggunakan Firebase Emulator Suite.
+
+---
+
+# 21. FITUR PENGATURAN
+
+Buat halaman:
+
+`/admin/settings`
+
+Pengaturan:
+- Nama website.
+- Nama universitas.
+- Tahun distribusi.
+- Logo.
+- Informasi kontak.
+- Informasi lokasi.
+- Informasi umum.
+- Pengaturan distribusi.
+
+Perubahan harus tersimpan di Firestore.
+
+Gunakan confirmation modal untuk perubahan penting.
+
+Jangan mengizinkan petugas mengubah pengaturan yang hanya diperuntukkan bagi Super Admin.
+
+---
+
+# 22. NOTIFIKASI
+
+Buat sistem notifikasi dalam admin panel.
+
+Notifikasi dapat muncul ketika:
+- Import berhasil.
+- Import gagal.
+- Jadwal berhasil diperbarui.
+- Data mahasiswa berhasil diubah.
+- Status KTM berhasil diperbarui.
+- Distribusi berhasil dikonfirmasi.
+- Pengumuman berhasil diterbitkan.
+
+Gunakan toast notification.
+
+Jangan menampilkan notifikasi berhasil sebelum operasi Firestore benar-benar berhasil.
+
+Untuk perubahan penting, tampilkan confirmation modal.
+
+---
+
+# 23. KEAMANAN DAN VALIDASI
+
+Pastikan admin panel memiliki:
+
+- Firebase Authentication.
+- Role-based access control.
+- Protected routes.
+- Firestore Security Rules.
+- Validasi input.
+- Validasi data Excel.
+- Error handling.
+- Loading state.
+- Session management.
+- Audit log.
+- Konfirmasi tindakan destruktif.
+
+Jangan menyimpan password dalam Firestore.
+
+Jangan menyimpan service account private key dalam frontend.
+
+Jangan menggunakan LocalStorage sebagai database utama.
+
+Jangan mengizinkan pengguna mengubah role melalui browser.
+
+Jangan memberikan akses admin kepada seluruh pengguna yang berhasil login.
+
+---
+
+# 24. STRUKTUR FILE
+
+Jika menggunakan React + Vite, gunakan struktur:
+
+src/
+├── assets/
+├── components/
+│   ├── admin/
+│   │   ├── AdminSidebar.jsx
+│   │   ├── AdminHeader.jsx
+│   │   ├── StatCard.jsx
+│   │   ├── DataTable.jsx
+│   │   ├── SearchBar.jsx
+│   │   ├── FilterPanel.jsx
+│   │   ├── Pagination.jsx
+│   │   ├── ConfirmModal.jsx
+│   │   └── StatusBadge.jsx
+├── pages/
+│   ├── admin/
+│   │   ├── AdminLogin.jsx
+│   │   ├── AdminDashboard.jsx
+│   │   ├── StudentManagement.jsx
+│   │   ├── StudentDetail.jsx
+│   │   ├── StudentForm.jsx
+│   │   ├── ScheduleManagement.jsx
+│   │   ├── ImportExcel.jsx
+│   │   ├── ExportData.jsx
+│   │   ├── Announcements.jsx
+│   │   ├── UserManagement.jsx
+│   │   ├── Monitoring.jsx
+│   │   ├── AuditLog.jsx
+│   │   └── Settings.jsx
+├── services/
+│   ├── firebase.js
+│   ├── authService.js
+│   ├── studentService.js
+│   ├── scheduleService.js
+│   ├── importService.js
+│   ├── announcementService.js
+│   └── auditService.js
+├── hooks/
+├── utils/
+├── styles/
+├── App.jsx
+└── main.jsx
+
+Sesuaikan dengan struktur project yang telah dibuat sebelumnya.
+
+Jangan mengganti file yang sudah berfungsi tanpa alasan.
+
+---
+
+# 25. INTEGRASI DENGAN WEBSITE UTAMA
+
+Admin panel harus terintegrasi secara langsung dengan website utama KTM UPNVJ 2026.
+
+Ketika admin:
+- Mengubah data mahasiswa.
+- Mengubah jadwal.
+- Mengubah status KTM.
+- Membuat pengumuman.
+- Mengubah lokasi distribusi.
+
+Maka perubahan harus tercermin pada website mahasiswa melalui Firestore.
+
+Gunakan listener realtime seperti `onSnapshot` apabila memang dibutuhkan.
+
+Jangan membuat data mahasiswa berbeda antara admin panel dan website utama.
+
+Pastikan mahasiswa hanya dapat melihat data yang sesuai dengan akun mereka.
+
+---
+
+# 26. STANDAR PENGUJIAN
+
+Lakukan pengujian:
+
+1. Login Super Admin.
+2. Login Admin.
+3. Login Petugas.
+4. Login Mahasiswa.
+5. Akses halaman admin tanpa login.
+6. Akses halaman admin menggunakan akun mahasiswa.
+7. Import Excel.
+8. Validasi data Excel.
+9. Deteksi duplikasi NIM.
+10. Edit data mahasiswa.
+11. Edit jadwal.
+12. Ubah status KTM.
+13. Konfirmasi distribusi.
+14. Export Excel.
+15. Search mahasiswa.
+16. Filter mahasiswa.
+17. Pagination.
+18. Pengelolaan pengumuman.
+19. Audit log.
+20. Firestore Security Rules.
+
+Pastikan tidak ada:
+- Tombol mati.
+- Data statis yang menggantikan Firestore.
+- Data mahasiswa palsu.
+- Error yang tidak ditangani.
+- Akses ilegal.
+- Password yang disimpan di database.
+- Duplikasi data akibat import.
+
+---
+
+# 27. OUTPUT YANG SAYA INGINKAN
+
+Buat admin panel secara lengkap.
+
+Jangan hanya memberikan desain dashboard.
+
+Implementasikan seluruh fitur yang diperlukan.
+
+Jika project website utama sudah tersedia, lanjutkan project tersebut.
+
+Jika file project sudah tersedia, analisis struktur project terlebih dahulu.
+
+Jangan menghapus fitur website utama.
+
+Jangan mengganti konfigurasi Firebase yang sudah ada tanpa alasan.
+
+Berikan:
+- Seluruh file yang diperlukan.
+- Komponen UI.
+- Halaman admin.
+- Firebase integration.
+- Firestore Security Rules.
+- Struktur database.
+- Fitur import Excel.
+- Fitur export Excel.
+- Fitur pengelolaan mahasiswa.
+- Fitur pengelolaan jadwal.
+- Fitur pengelolaan status KTM.
+- Fitur monitoring distribusi.
+- Fitur audit log.
+- Panduan konfigurasi.
+- Panduan menjalankan website.
+- Panduan deployment.
+
+Jangan memberikan kode yang hanya berupa contoh atau pseudocode.
+
+Jangan menggunakan data dummy sebagai pengganti data asli.
+
+Pastikan kode dapat dijalankan dan seluruh fitur yang diimplementasikan benar-benar berfungsi.
+
+**PRIORITAS UTAMA:**
+
+Buat ADMIN PANEL KTM UPNVJ 2026 yang modern, profesional, aman, responsif, dan terintegrasi dengan website utama.
+
+Gunakan perpaduan warna hijau, biru tosca, dan kuning.
+
+Gunakan Firebase Authentication dan Firestore sebagai infrastruktur utama.
+
+Jadikan file Excel yang saya berikan sebagai sumber data utama mahasiswa.
+
+Pastikan admin dapat mengelola seluruh proses pembuatan dan distribusi KTM secara efisien.
+
+Mulai dengan menganalisis project website utama yang sudah ada, lalu implementasikan admin panel tanpa merusak fitur sebelumnya.

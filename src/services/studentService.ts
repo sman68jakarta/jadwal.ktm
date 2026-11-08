@@ -217,6 +217,184 @@ export const studentService = {
   },
 
   /**
+   * Add a new student record
+   */
+  async addStudent(studentData: Omit<Student, 'no'>): Promise<Student> {
+    const cleanNim = studentData.nim.trim();
+    const existing = inMemoryStudents.find(s => s.nim === cleanNim);
+    if (existing) {
+      throw new Error(`Mahasiswa dengan NIM ${cleanNim} sudah terdaftar.`);
+    }
+
+    const nextNo = inMemoryStudents.length > 0 ? Math.max(...inMemoryStudents.map(s => s.no)) + 1 : 1;
+    const newStudent: Student = {
+      ...studentData,
+      no: nextNo,
+      nim: cleanNim,
+      updatedAt: new Date().toISOString()
+    };
+
+    inMemoryStudents.push(newStudent);
+    saveToLocalStorage(inMemoryStudents);
+
+    try {
+      const docRef = doc(db, STUDENTS_COLLECTION, cleanNim);
+      await setDoc(docRef, newStudent);
+    } catch (err) {
+      console.warn('Firestore add student warning:', err);
+    }
+
+    return newStudent;
+  },
+
+  /**
+   * Delete a student by NIM
+   */
+  async deleteStudent(nim: string): Promise<boolean> {
+    const cleanNim = nim.trim();
+    inMemoryStudents = inMemoryStudents.filter(s => s.nim !== cleanNim);
+    saveToLocalStorage(inMemoryStudents);
+
+    try {
+      const docRef = doc(db, STUDENTS_COLLECTION, cleanNim);
+      const { deleteDoc } = await import('firebase/firestore');
+      await deleteDoc(docRef);
+    } catch (err) {
+      console.warn('Firestore delete student warning:', err);
+    }
+
+    return true;
+  },
+
+  /**
+   * Bulk update status for multiple students
+   */
+  async bulkUpdateStatus(nims: string[], status: KTMStatus, officerName?: string): Promise<number> {
+    const now = new Date().toISOString();
+    let updatedCount = 0;
+    const batchUpdates: Student[] = [];
+
+    inMemoryStudents = inMemoryStudents.map(student => {
+      if (nims.includes(student.nim)) {
+        updatedCount++;
+        const updated: Student = {
+          ...student,
+          statusKTM: status,
+          keterangan: status,
+          petugasDistribusi: officerName || student.petugasDistribusi,
+          updatedAt: now
+        };
+        batchUpdates.push(updated);
+        return updated;
+      }
+      return student;
+    });
+
+    saveToLocalStorage(inMemoryStudents);
+
+    try {
+      const batch = writeBatch(db);
+      for (const s of batchUpdates.slice(0, 400)) {
+        batch.set(doc(db, STUDENTS_COLLECTION, s.nim), s, { merge: true });
+      }
+      await batch.commit();
+    } catch (err) {
+      console.warn('Firestore bulk status update warning:', err);
+    }
+
+    return updatedCount;
+  },
+
+  /**
+   * Bulk update schedule for multiple students
+   */
+  async bulkUpdateSchedule(nims: string[], updates: { jadwal: string; hariDistribusi: string; tanggalDistribusi: string; waktuDistribusi: string; lokasiDistribusi?: string }): Promise<number> {
+    const now = new Date().toISOString();
+    let count = 0;
+    const batchUpdates: Student[] = [];
+
+    inMemoryStudents = inMemoryStudents.map(student => {
+      if (nims.includes(student.nim)) {
+        count++;
+        const updated: Student = {
+          ...student,
+          ...updates,
+          lokasiDistribusi: updates.lokasiDistribusi || student.lokasiDistribusi,
+          updatedAt: now
+        };
+        batchUpdates.push(updated);
+        return updated;
+      }
+      return student;
+    });
+
+    saveToLocalStorage(inMemoryStudents);
+
+    try {
+      const batch = writeBatch(db);
+      for (const s of batchUpdates.slice(0, 400)) {
+        batch.set(doc(db, STUDENTS_COLLECTION, s.nim), s, { merge: true });
+      }
+      await batch.commit();
+    } catch (err) {
+      console.warn('Firestore bulk schedule update warning:', err);
+    }
+
+    return count;
+  },
+
+  /**
+   * Bulk delete selected students
+   */
+  async bulkDeleteStudents(nims: string[]): Promise<number> {
+    const initialCount = inMemoryStudents.length;
+    inMemoryStudents = inMemoryStudents.filter(s => !nims.includes(s.nim));
+    saveToLocalStorage(inMemoryStudents);
+
+    try {
+      const { deleteDoc } = await import('firebase/firestore');
+      for (const nim of nims.slice(0, 50)) {
+        await deleteDoc(doc(db, STUDENTS_COLLECTION, nim));
+      }
+    } catch (err) {
+      console.warn('Firestore bulk delete warning:', err);
+    }
+
+    return initialCount - inMemoryStudents.length;
+  },
+
+  /**
+   * Handover confirmation: Petugas confirms student received their KTM
+   */
+  async confirmKTMReceived(nim: string, officerName: string): Promise<Student | null> {
+    const cleanNim = nim.trim();
+    const idx = inMemoryStudents.findIndex(s => s.nim === cleanNim);
+    if (idx === -1) return null;
+
+    const now = new Date().toISOString();
+    const updated: Student = {
+      ...inMemoryStudents[idx],
+      statusKTM: 'Sudah Didistribusikan',
+      keterangan: 'Sudah Didistribusikan',
+      petugasDistribusi: officerName,
+      waktuPenerimaan: now,
+      updatedAt: now
+    };
+
+    inMemoryStudents[idx] = updated;
+    saveToLocalStorage(inMemoryStudents);
+
+    try {
+      const docRef = doc(db, STUDENTS_COLLECTION, cleanNim);
+      await setDoc(docRef, updated, { merge: true });
+    } catch (err) {
+      console.warn('Firestore confirm handover warning:', err);
+    }
+
+    return updated;
+  },
+
+  /**
    * Reset to original seed data
    */
   resetToDefault(): Student[] {
@@ -232,3 +410,4 @@ export const studentService = {
     return calculateStudentStatistics(inMemoryStudents);
   }
 };
+

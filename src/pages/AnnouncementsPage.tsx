@@ -98,17 +98,22 @@ export const AnnouncementsPage: React.FC<AnnouncementsPageProps> = ({ currentUse
     return true;
   });
 
-  const getCategoryBadge = (cat: Announcement['category']) => {
-    const config = {
+  const getCategoryBadge = (cat: string) => {
+    const configMap: Record<string, { label: string; bg: string }> = {
       jadwal: { label: 'Jadwal & Waktu', bg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
       syarat: { label: 'Persyaratan', bg: 'bg-teal-50 text-teal-800 border-teal-200' },
       lokasi: { label: 'Titik Lokasi', bg: 'bg-amber-50 text-amber-800 border-amber-200' },
-      penting: { label: 'Pemberitahuan Penting', bg: 'bg-rose-50 text-rose-800 border-rose-200' }
-    }[cat];
+      penting: { label: 'Pemberitahuan Penting', bg: 'bg-rose-50 text-rose-800 border-rose-200' },
+      informasi: { label: 'Informasi Umum', bg: 'bg-blue-50 text-blue-800 border-blue-200' },
+      perubahan: { label: 'Perubahan Jadwal', bg: 'bg-orange-50 text-orange-800 border-orange-200' },
+      administrasi: { label: 'Administrasi', bg: 'bg-purple-50 text-purple-800 border-purple-200' }
+    };
+
+    const cfg = configMap[cat] || { label: cat.toUpperCase(), bg: 'bg-slate-50 text-slate-800 border-slate-200' };
 
     return (
-      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${config.bg}`}>
-        {config.label}
+      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${cfg.bg}`}>
+        {cfg.label}
       </span>
     );
   };

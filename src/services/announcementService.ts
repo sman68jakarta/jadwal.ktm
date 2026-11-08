@@ -118,6 +118,20 @@ export const announcementService = {
     return fullAnn;
   },
 
+  async getAnnouncements(): Promise<Announcement[]> {
+    return this.getAll();
+  },
+
+  async addAnnouncement(ann: Omit<Announcement, 'id'>): Promise<Announcement> {
+    return this.saveAnnouncement(ann);
+  },
+
+  async updateAnnouncement(id: string, updates: Partial<Announcement>): Promise<Announcement | null> {
+    const existing = inMemoryAnnouncements.find(a => a.id === id);
+    if (!existing) return null;
+    return this.saveAnnouncement({ ...existing, ...updates, id });
+  },
+
   async deleteAnnouncement(id: string): Promise<boolean> {
     try {
       await deleteDoc(doc(db, ANNOUNCEMENTS_COLLECTION, id));

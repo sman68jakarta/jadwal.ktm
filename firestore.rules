@@ -2,54 +2,140 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if user is authenticated
+    // ==========================================
+    // HELPER FUNCTIONS & ROLE-BASED ACCESS CONTROL
+    // ==========================================
+    
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    // Helper function to check if user is admin
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'super_admin' ||
+        (request.auth.token.email != null && request.auth.token.email == 'superadmin@upnvj.ac.id') ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         getUserData().role == 'super_admin')
+      );
+    }
+    
     function isAdmin() {
-      return isAuthenticated() && 
-        (request.auth.token.role == 'admin' || 
-         request.auth.token.email.matches('.*admin@upnvj\\.ac\\.id') ||
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      return isAuthenticated() && (
+        isSuperAdmin() ||
+        request.auth.token.role == 'admin' ||
+        (request.auth.token.email != null && (
+          request.auth.token.email == 'admin@upnvj.ac.id' ||
+          request.auth.token.email.matches('.*admin@upnvj\\.ac\\.id')
+        )) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         getUserData().role == 'admin')
+      );
     }
 
-    // Helper function to verify student ownership: student can only read their own record by NIM
+    function isOfficer() {
+      return isAuthenticated() && (
+        isAdmin() ||
+        request.auth.token.role == 'petugas' ||
+        request.auth.token.role == 'staff' ||
+        (request.auth.token.email != null && request.auth.token.email.matches('.*petugas.*@upnvj\\.ac\\.id')) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         (getUserData().role == 'petugas' || getUserData().role == 'staff'))
+      );
+    }
+
     function isOwnerStudent(nim) {
-      return isAuthenticated() && 
-        (request.auth.token.nim == nim || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.nim == nim);
+      return isAuthenticated() && (
+        request.auth.token.nim == nim ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         getUserData().nim == nim)
+      );
     }
 
-    // Students Collection:
-    // - Students can ONLY read their own document (by their registered NIM)
-    // - Admins can read, create, update, and delete all student records
+    // ==========================================
+    // 1. STUDENTS COLLECTION
+    // ==========================================
+    // - Students: ONLY read their own document by their exact NIM
+    // - Officers (Petugas): Can read all students and update distribution status (handover)
+    // - Admins / Super Admin: Full CRUD on all student records
     match /students/{studentNim} {
-      allow read: if isAdmin() || isOwnerStudent(studentNim);
+      allow read: if isOfficer() || isOwnerStudent(studentNim);
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isOfficer() && 
+        // Officers can only confirm handover status and distribution notes
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['statusKTM', 'keterangan', 'waktuDistribusi', 'catatanKhusus', 'updatedAt', 'petugasDistribusi'])
+      );
+    }
+
+    // ==========================================
+    // 2. USERS COLLECTION (ACCOUNTS & ROLES)
+    // ==========================================
+    // - Each user can read their own profile
+    // - Super Admin can manage all roles and accounts
+    // - Admin can read all users
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow create: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) ||
+        isSuperAdmin()
+      );
+      allow delete: if isSuperAdmin();
+    }
+
+    // ==========================================
+    // 3. SCHEDULES COLLECTION (JADWAL DISTRIBUSI)
+    // ==========================================
+    // - Read: All authenticated users and public
+    // - Write: Admin and Super Admin
+    match /schedules/{scheduleId} {
+      allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Users Collection:
-    // - Each user can read and update their own profile document
-    // - Admin can manage all user records
-    match /users/{userId} {
-      allow read, write: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-    }
-
-    // Announcements Collection:
-    // - Public or all students can read active announcements
-    // - Only admin can create, update, or delete announcements
+    // ==========================================
+    // 4. ANNOUNCEMENTS COLLECTION (PENGUMUMAN)
+    // ==========================================
+    // - Read: Public for all active announcements
+    // - Write: Admin and Super Admin
     match /announcements/{announcementId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Settings Collection:
-    // - Read allowed for all users
-    // - Write only for admin
+    // ==========================================
+    // 5. SETTINGS COLLECTION (PENGATURAN WEBSITE)
+    // ==========================================
+    // - Read: Public
+    // - Write: Super Admin only
     match /settings/{settingId} {
       allow read: if true;
+      allow write: if isSuperAdmin() || isAdmin();
+    }
+
+    // ==========================================
+    // 6. AUDIT LOGS COLLECTION (CATATAN AKTIVITAS)
+    // ==========================================
+    // - Read: Super Admin and Admin
+    // - Create: Logged by authenticated officers, admins, super admin
+    // - Update / Delete: STRICTLY FORBIDDEN (Audit logs are immutable!)
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isOfficer();
+      allow update, delete: if false;
+    }
+
+    // ==========================================
+    // 7. IMPORT HISTORY COLLECTION (RIWAYAT EXCEL)
+    // ==========================================
+    // - Read & Write: Admin and Super Admin
+    match /import_history/{historyId} {
+      allow read: if isAdmin();
       allow write: if isAdmin();
     }
   }

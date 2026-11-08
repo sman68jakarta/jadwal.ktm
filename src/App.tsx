@@ -12,7 +12,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { StudentSchedule } from './pages/StudentSchedule';
-import { AdminDashboard } from './pages/AdminDashboard';
+import { AdminLayout } from './pages/admin/AdminLayout';
 import { AnnouncementsPage } from './pages/AnnouncementsPage';
 import { HelpPage } from './pages/HelpPage';
 import { ArrowUp, ShieldAlert } from 'lucide-react';
@@ -31,14 +31,24 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isAdminRole = (user: UserProfile | null) => {
+    return user && (
+      user.role === 'super_admin' || 
+      user.role === 'admin' || 
+      user.role === 'petugas' || 
+      user.role === 'staff'
+    );
+  };
+
   const handleNavigate = (view: string) => {
     // Protected route check
     if ((view === 'dashboard' || view === 'schedule') && !currentUser) {
       setCurrentView('login');
       return;
     }
-    if (view === 'admin-dashboard' && currentUser?.role !== 'admin') {
-      setCurrentView('login');
+    if (view === 'admin-dashboard' && !isAdminRole(currentUser)) {
+      // Direct to admin-login if not authenticated as admin
+      setCurrentView('admin-login');
       return;
     }
     setCurrentView(view);
@@ -47,7 +57,7 @@ export default function App() {
 
   const handleLoginSuccess = (user: UserProfile) => {
     setCurrentUser(user);
-    if (user.role === 'admin') {
+    if (isAdminRole(user)) {
       setCurrentView('admin-dashboard');
     } else {
       setCurrentView('dashboard');
@@ -72,10 +82,21 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // If in dedicated Admin Panel, render AdminLayout as a separate, self-contained dashboard
+  if (currentView === 'admin-dashboard') {
+    return (
+      <AdminLayout
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onNavigatePublic={() => handleNavigate('landing')}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-emerald-200 selection:text-emerald-900">
       
-      {/* Universal Navigation */}
+      {/* Universal Navigation for Public & Student Views */}
       <Navbar
         currentUser={currentUser}
         currentView={currentView}
@@ -88,6 +109,7 @@ export default function App() {
         {currentView === 'landing' && (
           <LandingPage
             onNavigateLogin={handleGoToLogin}
+            onNavigateAdminLogin={() => handleNavigate('admin-login')}
             onNavigateHelp={() => handleNavigate('help')}
           />
         )}
@@ -95,6 +117,15 @@ export default function App() {
         {currentView === 'login' && (
           <LoginPage
             initialNim={prefilledNim}
+            initialMode="student"
+            onLoginSuccess={handleLoginSuccess}
+            onNavigateHelp={() => handleNavigate('help')}
+          />
+        )}
+
+        {currentView === 'admin-login' && (
+          <LoginPage
+            initialMode="admin"
             onLoginSuccess={handleLoginSuccess}
             onNavigateHelp={() => handleNavigate('help')}
           />
@@ -113,10 +144,6 @@ export default function App() {
             currentUser={currentUser}
             onBackToDashboard={() => handleNavigate('dashboard')}
           />
-        )}
-
-        {currentView === 'admin-dashboard' && currentUser?.role === 'admin' && (
-          <AdminDashboard currentUser={currentUser} />
         )}
 
         {currentView === 'announcements' && (
@@ -146,7 +173,7 @@ export default function App() {
       </main>
 
       {/* Universal University Footer */}
-      <Footer />
+      <Footer onNavigate={handleNavigate} />
 
       {/* Back to top floating button */}
       {showScrollTop && (
