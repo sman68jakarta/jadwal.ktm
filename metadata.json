@@ -1,0 +1,6 @@
+{
+  "name": "DATA PEMBUATAN DAN PEMBAGIAN KARTU TANDA MAHASISWA BARU UPNVJ",
+  "description": "Sistem Informasi Pembuatan dan Distribusi Kartu Tanda Mahasiswa Baru Universitas Pembangunan Nasional \"Veteran\" Jakarta Tahun 2026.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'admin' || 
+         request.auth.token.email.matches('.*admin@upnvj\\.ac\\.id') ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+
+    // Helper function to verify student ownership: student can only read their own record by NIM
+    function isOwnerStudent(nim) {
+      return isAuthenticated() && 
+        (request.auth.token.nim == nim || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.nim == nim);
+    }
+
+    // Students Collection:
+    // - Students can ONLY read their own document (by their registered NIM)
+    // - Admins can read, create, update, and delete all student records
+    match /students/{studentNim} {
+      allow read: if isAdmin() || isOwnerStudent(studentNim);
+      allow write: if isAdmin();
+    }
+
+    // Users Collection:
+    // - Each user can read and update their own profile document
+    // - Admin can manage all user records
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Announcements Collection:
+    // - Public or all students can read active announcements
+    // - Only admin can create, update, or delete announcements
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Settings Collection:
+    // - Read allowed for all users
+    // - Write only for admin
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
