@@ -103,6 +103,8 @@ git push -u origin main
 
 File `vercel.json` sudah disediakan dalam repositori ini untuk menjamin routing SPA (Single Page Application) bekerja sempurna tanpa error 404 saat me-refresh halaman.
 
+Seluruh aset logo dan poster UPNVJ telah diintegrasikan langsung ke dalam pipeline asset bundling Vite (`src/assets/logo.ts` & `public/logo-upnvj.png`), sehingga otomatis di-hash dan disajikan secara aman tanpa risiko 404 di Vercel, Netlify, maupun domain custom.
+
 ---
 
 ### 6. Cara Menjalankan Secara Lokal (Local Development)

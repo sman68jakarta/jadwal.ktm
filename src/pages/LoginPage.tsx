@@ -17,6 +17,7 @@ import {
 import { authService } from '../services/authService';
 import { UserProfile } from '../types';
 import { Modal } from '../components/Modal';
+import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 
 interface LoginPageProps {
   initialNim?: string;
@@ -131,7 +132,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 p-6 text-white text-center relative">
             <div className="flex justify-center mb-3">
               <img 
-                src="/public/assets/aistudio/Poster_Resmi_UPNVJ_Kartu_Mahasiswa_Baru_accf847f.png" 
+                src={UPNVJ_LOGO_SRC} 
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = UPNVJ_LOGO_FALLBACK; }}
                 alt="Logo UPNVJ" 
                 className="w-16 h-16 object-contain rounded-full bg-white/10 p-1 border-2 border-amber-400 shadow-md"
               />

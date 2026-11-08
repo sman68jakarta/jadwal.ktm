@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserProfile } from '../types';
+import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 import { 
   GraduationCap, 
   Calendar, 
@@ -80,7 +81,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <div className="relative">
               <img 
-                src="/public/assets/aistudio/Poster_Resmi_UPNVJ_Kartu_Mahasiswa_Baru_accf847f.png" 
+                src={UPNVJ_LOGO_SRC} 
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = UPNVJ_LOGO_FALLBACK; }}
                 alt="Logo UPN Veteran Jakarta" 
                 className="w-10 h-10 md:w-11 md:h-11 object-contain rounded-full shadow-xs group-hover:scale-105 transition-transform border border-emerald-500/30"
               />

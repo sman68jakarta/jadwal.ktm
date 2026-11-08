@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Student } from '../types';
 import { studentService } from '../services/studentService';
+import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 
 interface LandingPageProps {
   onNavigateLogin: (prefilledNim?: string) => void;
@@ -195,7 +196,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 
                 <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl p-4 sm:p-5 text-center">
                   <img 
-                    src="/public/assets/aistudio/Poster_Resmi_UPNVJ_Kartu_Mahasiswa_Baru_accf847f.png" 
+                    src={UPNVJ_LOGO_SRC} 
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = UPNVJ_LOGO_FALLBACK; }}
                     alt="Poster Resmi UPNVJ Kartu Mahasiswa Baru" 
                     className="w-full h-auto object-contain rounded-xl shadow-lg border border-slate-800"
                   />

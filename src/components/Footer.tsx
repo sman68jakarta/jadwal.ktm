@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, MapPin, Phone, Mail, Clock, ExternalLink } from 'lucide-react';
+import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 
 export const Footer: React.FC = () => {
   return (
@@ -11,7 +12,8 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
               <img 
-                src="/public/assets/aistudio/Poster_Resmi_UPNVJ_Kartu_Mahasiswa_Baru_accf847f.png" 
+                src={UPNVJ_LOGO_SRC} 
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = UPNVJ_LOGO_FALLBACK; }}
                 alt="Logo UPN Veteran Jakarta" 
                 className="w-12 h-12 object-contain rounded-full bg-white/10 p-1 border border-emerald-500/40"
               />

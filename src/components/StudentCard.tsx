@@ -2,6 +2,7 @@ import React from 'react';
 import { Student } from '../types';
 import { StatusBadge } from './StatusBadge';
 import { ShieldCheck, Award, QrCode, Copy, Check } from 'lucide-react';
+import { UPNVJ_LOGO_SRC, UPNVJ_LOGO_FALLBACK } from '../assets/logo';
 
 interface StudentCardProps {
   student: Student;
@@ -37,7 +38,8 @@ export const StudentCard: React.FC<StudentCardProps> = ({ student, onCopyNim }) 
       <div className="relative flex items-center justify-between border-b border-emerald-500/20 pb-4 mb-6">
         <div className="flex items-center gap-3.5">
           <img 
-            src="/public/assets/aistudio/Poster_Resmi_UPNVJ_Kartu_Mahasiswa_Baru_accf847f.png" 
+            src={UPNVJ_LOGO_SRC} 
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = UPNVJ_LOGO_FALLBACK; }}
             alt="Logo UPN Veteran Jakarta" 
             className="w-14 h-14 object-contain rounded-full shadow-md bg-white/10 p-1 backdrop-blur-xs border border-amber-400/40"
           />
