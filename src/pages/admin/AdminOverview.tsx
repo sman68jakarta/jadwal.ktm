@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { UserProfile, Student, AuditLog } from '../../types';
 import { studentService } from '../../services/studentService';
 import { auditService } from '../../services/auditService';
+import { googleSheetsSyncService, GoogleSheetsConfig } from '../../services/googleSheetsSyncService';
 import { 
   Users, 
   CheckCircle, 
@@ -16,7 +17,8 @@ import {
   Bell, 
   Search,
   Building,
-  Sparkles
+  Sparkles,
+  RefreshCw
 } from 'lucide-react';
 
 interface AdminOverviewProps {
@@ -32,20 +34,52 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
   const [students, setStudents] = useState<Student[]>([]);
   const [recentLogs, setRecentLogs] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [sheetsConfig, setSheetsConfig] = useState<GoogleSheetsConfig>(googleSheetsSyncService.getConfig());
+  const [isSyncingSheets, setIsSyncingSheets] = useState(false);
+
+  const reloadOverviewData = async () => {
+    const allStudents = await studentService.getAllStudents();
+    setStudents(allStudents);
+    setStats(studentService.getStatistics());
+    const logs = await auditService.getAuditLogs(6);
+    setRecentLogs(logs);
+  };
 
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
-      const allStudents = await studentService.getAllStudents();
-      setStudents(allStudents);
-      setStats(studentService.getStatistics());
-
-      const logs = await auditService.getAuditLogs(6);
-      setRecentLogs(logs);
+      await reloadOverviewData();
       setIsLoading(false);
     }
     loadData();
+
+    // Listen to Google Sheets sync events
+    const unsubSheets = googleSheetsSyncService.subscribe((cfg) => {
+      setSheetsConfig(cfg);
+    });
+
+    const handleKtmUpdated = () => {
+      reloadOverviewData();
+    };
+
+    window.addEventListener('ktm_students_updated', handleKtmUpdated);
+
+    return () => {
+      unsubSheets();
+      window.removeEventListener('ktm_students_updated', handleKtmUpdated);
+    };
   }, []);
+
+  const handleSyncNow = async () => {
+    if (isSyncingSheets) return;
+    setIsSyncingSheets(true);
+    try {
+      await googleSheetsSyncService.performSync(currentUser);
+      await reloadOverviewData();
+    } finally {
+      setIsSyncingSheets(false);
+    }
+  };
 
   const totalSudahDiambil = students.filter(s => s.statusKTM === 'Sudah Didistribusikan').length;
 
@@ -87,6 +121,65 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
               <span>Kelola Mahasiswa</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Google Sheets Real-Time Sync Status Bar */}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
+            <FileSpreadsheet className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs sm:text-sm font-bold text-slate-800">
+                Sinkronisasi Google Spreadsheet:
+              </span>
+              <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                sheetsConfig.spreadsheetUrl
+                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                  : 'bg-amber-100 text-amber-800 border border-amber-300'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${sheetsConfig.spreadsheetUrl ? 'bg-emerald-600 animate-pulse' : 'bg-amber-500'}`} />
+                {sheetsConfig.spreadsheetUrl ? 'Otomatis Terhubung' : 'Link Belum Dikonfigurasi'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {sheetsConfig.spreadsheetUrl ? (
+                <span>
+                  {sheetsConfig.lastSyncTime ? (
+                    <>Terakhir disinkronkan: <strong className="text-slate-700">{new Date(sheetsConfig.lastSyncTime).toLocaleTimeString('id-ID')}</strong> ({sheetsConfig.lastSyncMessage || 'Data web telah sesuai spreadsheet'})</>
+                  ) : (
+                    'Link tersimpan. Menunggu sinkronisasi berkala...'
+                  )}
+                </span>
+              ) : (
+                'Masukkan link Google Spreadsheet di Admin Panel agar status KTM mahasiswa baru otomatis terupdate saat spreadsheet diedit.'
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+          {sheetsConfig.spreadsheetUrl && (
+            <button
+              type="button"
+              onClick={handleSyncNow}
+              disabled={isSyncingSheets}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition-all active:scale-98 disabled:opacity-60"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingSheets ? 'animate-spin' : ''}`} />
+              <span>{isSyncingSheets ? 'Mensinkronkan...' : 'Sinkronkan Sekarang'}</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => onNavigateTab('import-export')}
+            className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+          >
+            <span>{sheetsConfig.spreadsheetUrl ? 'Pengaturan Spreadsheet' : 'Atur Link Spreadsheet →'}</span>
+          </button>
         </div>
       </div>
 

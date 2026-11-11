@@ -64,6 +64,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       setLoading(false);
     }
     loadData();
+
+    const handleSynced = () => {
+      loadData();
+    };
+
+    window.addEventListener('ktm_students_updated', handleSynced);
+    return () => {
+      window.removeEventListener('ktm_students_updated', handleSynced);
+    };
   }, [currentUser.nim]);
 
   const handleDownloadPdf = () => {

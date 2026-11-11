@@ -3,6 +3,7 @@ import { Student, UserProfile, KTMStatus } from '../../types';
 import { studentService } from '../../services/studentService';
 import { auditService } from '../../services/auditService';
 import { ConfirmModal } from '../../components/admin/ConfirmModal';
+import { GoogleSheetsSyncTab } from './GoogleSheetsSyncTab';
 import * as XLSX from 'xlsx';
 import { 
   FileSpreadsheet, 
@@ -14,7 +15,8 @@ import {
   RefreshCw, 
   ArrowRight, 
   X,
-  Database
+  Database,
+  Sparkles
 } from 'lucide-react';
 
 interface ImportExportExcelProps {
@@ -22,7 +24,7 @@ interface ImportExportExcelProps {
 }
 
 export const ImportExportExcel: React.FC<ImportExportExcelProps> = ({ currentUser }) => {
-  const [activeTab, setActiveTab] = useState<'import' | 'export'>('import');
+  const [activeTab, setActiveTab] = useState<'sheets-sync' | 'import' | 'export'>('sheets-sync');
 
   // Import State
   const [file, setFile] = useState<File | null>(null);
@@ -235,8 +237,24 @@ export const ImportExportExcel: React.FC<ImportExportExcelProps> = ({ currentUse
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       
-      {/* Top Tab Switcher: Import vs Export */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      {/* Top Tab Switcher: Sheets Sync vs Upload Import vs Export */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
+        <button
+          onClick={() => setActiveTab('sheets-sync')}
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+            activeTab === 'sheets-sync'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+          type="button"
+        >
+          <Sparkles className="w-4 h-4 text-amber-300" />
+          <span>Sinkronisasi Google Spreadsheet Real-Time</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-900">
+            Live
+          </span>
+        </button>
+
         <button
           onClick={() => setActiveTab('import')}
           className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
@@ -247,7 +265,7 @@ export const ImportExportExcel: React.FC<ImportExportExcelProps> = ({ currentUse
           type="button"
         >
           <Upload className="w-4 h-4" />
-          <span>Import Spreadsheet Excel (SheetJS)</span>
+          <span>Upload File Excel (.xlsx)</span>
         </button>
 
         <button
@@ -264,7 +282,11 @@ export const ImportExportExcel: React.FC<ImportExportExcelProps> = ({ currentUse
         </button>
       </div>
 
-      {activeTab === 'import' ? (
+      {activeTab === 'sheets-sync' && (
+        <GoogleSheetsSyncTab currentUser={currentUser} />
+      )}
+
+      {activeTab === 'import' && (
         <div className="space-y-6">
           
           {/* Section: Upload Box */}
@@ -499,7 +521,9 @@ export const ImportExportExcel: React.FC<ImportExportExcelProps> = ({ currentUse
           )}
 
         </div>
-      ) : (
+      )}
+
+      {activeTab === 'export' && (
         /* SECTION: EXPORT EXCEL */
         <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-2xs space-y-6">
           <div>

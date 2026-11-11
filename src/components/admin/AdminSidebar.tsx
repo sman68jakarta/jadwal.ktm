@@ -71,7 +71,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     {
       title: 'INTEGRASI DATA',
       items: [
-        { id: 'import-export', label: 'Import & Export Excel', icon: FileSpreadsheet, role: 'admin' }
+        { id: 'import-export', label: 'Sinkronisasi Spreadsheet & Excel', icon: FileSpreadsheet, role: 'admin', badge: 'Auto' }
       ]
     },
     {

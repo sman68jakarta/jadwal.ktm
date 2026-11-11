@@ -94,6 +94,15 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
 
   useEffect(() => {
     loadStudents();
+
+    const handleSynced = () => {
+      loadStudents();
+    };
+
+    window.addEventListener('ktm_students_updated', handleSynced);
+    return () => {
+      window.removeEventListener('ktm_students_updated', handleSynced);
+    };
   }, []);
 
   // Debounce search
